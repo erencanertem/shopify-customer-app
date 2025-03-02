@@ -7,24 +7,48 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'https://shopify-customer-app-frontend.onrender.com',
+  'https://shopify-customer-app.onrender.com'
+];
+
 const corsOptions = {
-  origin: [
-    'http://localhost:5173', // Development
-    'https://shopify-customer-app-frontend.onrender.com' // Production - Render
-  ],
+  origin: (origin, callback) => {
+    console.log('Origin:', origin);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
 };
 
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
+
+app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ message: "CORS Policy Error" });
+  }
+  next(err);
+});
+
+// ✅ API Routes
 app.use('/api/customers', customerRoutes);
 
-// Health check endpoint
+// ✅ Health Check
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
