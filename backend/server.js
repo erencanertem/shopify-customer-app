@@ -9,11 +9,8 @@ const app = express();
 
 
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:3000',
   'https://shopify-customer-app-1.onrender.com',
-  'https://shopify-customer-app.onrender.com'
+  'http://localhost:5173',
 ];
 
 const corsOptions = {
